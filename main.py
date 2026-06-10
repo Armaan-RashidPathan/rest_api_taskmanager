@@ -110,3 +110,28 @@ def delete_task(
         raise HTTPException(status_code=404, detail="Task not found")
     db.delete(db_task)
     db.commit() 
+
+import httpx
+import asyncio
+
+# Single async call
+@app.get("/joke")
+async def get_joke():
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            "https://official-joke-api.appspot.com/random_joke"
+        )
+        data = response.json()
+        return {"setup": data["setup"], "punchline": data["punchline"]}
+
+# Multiple concurrent calls with asyncio.gather
+@app.get("/jokes/three")
+async def get_three_jokes():
+    async with httpx.AsyncClient() as client:
+        # These three requests fire SIMULTANEOUSLY, not one after another
+        r1, r2, r3 = await asyncio.gather(
+            client.get("https://official-joke-api.appspot.com/random_joke"),
+            client.get("https://official-joke-api.appspot.com/random_joke"),
+            client.get("https://official-joke-api.appspot.com/random_joke"),
+        )
+        return [r1.json(), r2.json(), r3.json()]

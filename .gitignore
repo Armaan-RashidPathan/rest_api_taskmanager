@@ -24,3 +24,6 @@ venv/
 Thumbs.db
 
 .claude
+
+.uvicorn_err.txt
+.uvicorn_out.txt
